@@ -3,7 +3,6 @@ import { useState, useEffect } from 'react';
 import React from 'react';
 
 const PerformansListe = ({ performansListesi, kapsamaBirimData, error }) => {
-  if (error) return <div>{JSON.stringify(error)}</div>;
   //SWR veya ReactQuery kullanılarak state management geliştirilebilir.
   const [performansListe, setPerformansListe] = useState(performansListesi);
   const [kapsamaBirimListe, setKapsamaBirimListe] = useState(kapsamaBirimData);
@@ -38,6 +37,8 @@ const PerformansListe = ({ performansListesi, kapsamaBirimData, error }) => {
     document.getElementById('UpdateOzelAlanGurubu').value =
       performansEkle.OzelAlanGurubu;
   }, [performansEkle]);
+
+  if (error) return <div>{JSON.stringify(error)}</div>;
 
   const handleOpenAddModal = async () => {
     document.getElementById('datePicker').valueAsDate = new Date();
@@ -167,7 +168,10 @@ const PerformansListe = ({ performansListesi, kapsamaBirimData, error }) => {
       `${apiPath}api/aIk/aPerformansListe?action=deletePerformance`,
       {
         method: 'POST',
-        body: JSON.stringify({IDPerformans:performansListe[e.target.getAttribute('index')].IDPerformans}),
+        body: JSON.stringify({
+          IDPerformans:
+            performansListe[e.target.getAttribute('index')].IDPerformans,
+        }),
       }
     );
     await response.json();
@@ -253,7 +257,10 @@ const PerformansListe = ({ performansListesi, kapsamaBirimData, error }) => {
                 <div className='grid-item'>{item.OzelAlanGurubu}</div>
                 <div className='grid-item'>{item.OzelAlanAd}</div>
                 <div className='grid-item'>
-                  {new Date(item.OlusturmaTarihi).toLocaleDateString()}
+                  {/* GEÇİCİ ÇÖZÜM => CLIENT-SERVER FORMAT FARKI SEBEBİYLE HATA VERİYOR | MOMENT VEYA DATE-FNS KULLANILABİLİR */}
+                  <span suppressHydrationWarning> 
+                    {new Date(item.OlusturmaTarihi).toLocaleDateString()}
+                  </span>
                 </div>
                 <div className='grid-item justify-center'>
                   <input type='checkbox' checked={item.Durum} disabled />
@@ -366,7 +373,7 @@ const PerformansListe = ({ performansListesi, kapsamaBirimData, error }) => {
                   className='border border-black w-72'
                   type='date'
                   id='datePicker'
-                  valueasdate={performansEkle.OlusturmaTarihi}
+                  valueasdate={performansEkle.OlusturmaTarihi} // GEÇİCİ ÇÖZÜM => CLIENT-SERVER FORMAT FARKI SEBEBİYLE HATA VERİYOR | MOMENT VEYA DATE-FNS KULLANILABİLİR
                 />
               </div>
               <div className='flex flex-row gap-2 col-start-2 pl-11'>
